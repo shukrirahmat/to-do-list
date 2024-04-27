@@ -1,8 +1,44 @@
-function createToDo(title, description, dueDate, priority) {
-    const note = "";
-    const checklist = false;
+function ToDo(title, description, dueDate, priority) {
+    let check = false;
+    let note = false;
+    
+    const getTitle = () => title;
+    const getdescription = () => description;
+    const getDueDate = () => dueDate;
+    const getPriority = () => priority;
+    const getCheck = () => check;
+    const getNote = () => note;
 
-    return {title, description, dueDate, priority, note, checklist};
+    const edit = (todo) => {
+        title = todo.getTitle();
+        description = todo.getdescription();
+        dueDate = todo.getDueDate();
+        priority = todo.getPriority();
+    }
+
+    const toggleCheck = () => {
+        if (check) {
+            check = false;
+        } else {
+            check = true;
+        }
+    }
+
+    const addNote = (text) => {
+        note = text;
+    }
+    
+    return {
+        getTitle,
+        getdescription,
+        getDueDate,
+        getPriority,
+        getCheck,
+        getNote,
+        edit,
+        toggleCheck,
+        addNote
+    }
 }
 
-export {createToDo};
+export default ToDo;
