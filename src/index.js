@@ -1,9 +1,5 @@
 import "./styles.css";
-import Project from "./project";
+import Page from "./page";
 
-let project = Project('project');
-let todo = project.getToDo()[0];
-console.log(todo.getTitle());
-console.log(todo.getCheck());
-todo.toggleCheck();
-console.log(todo.getCheck());
+const page = Page();
+page.load();
