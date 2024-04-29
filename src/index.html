@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To Do List</title>
 </head>
+
 <body>
     <div id="header">TO DO LIST</div>
     <div id="sidebar">
@@ -20,11 +22,40 @@
             <h2>PROJECTS</h2>
             <nav class="projectcontainer">
             </nav>
-            <button>ADD</button>
+            <button id="addprojectbtn">ADD NEW PROJECT</button>
         </div>
     </div>
     <div id="maincontent">
         <div></div>
     </div>
+    <dialog>
+        <form>
+            <div>
+                <label for="title">TITLE</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div>
+                <label for="duedate">DUEDATE</label>
+                <input type="date" id="duedate" name="duedate" required>
+            </div>
+            <div>
+                <label for="priority">PRIORITY</label>
+                <select id="priority" name="priority">
+                    <option value="Low">LOW</option>
+                    <option value="Normal">NORMAL</option>
+                    <option value="High">HIGH</option>
+                </select>
+            </div>
+            <div>
+                <label for="description">DESCRIPTION</label>
+                <textarea id="description" name="description" placeholder="Write something.." style="height:200px"></textarea>
+            </div>
+            <div>
+                <button class="confirm">Add</button>
+                <button class="cancel">Cancel</button>
+            </div>
+        </form>
+    </dialog>
 </body>
+
 </html>

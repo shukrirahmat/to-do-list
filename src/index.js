@@ -1,5 +1,4 @@
 import "./styles.css";
-import Page from "./page";
+import { domInitialSetup } from "./dom";
 
-const page = Page();
-page.load();
+domInitialSetup();
