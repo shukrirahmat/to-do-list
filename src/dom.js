@@ -1,5 +1,6 @@
 import pm from "./projectManager";
 import Project from "./project";
+import ToDo from "./todo";
 
 function Dom() {
 
@@ -11,6 +12,8 @@ function Dom() {
     const projectcancel = document.querySelector('#projectform .cancel');
     const projectrename = document.querySelector('#projectrename');
     const projectdelete = document.querySelector('#projectdelete');
+    const maincontent = document.querySelector('#maincontent');
+    const tododialog = document.querySelector('#tododialog');
 
     const initialSetup = () => {
         dialogSetup();
@@ -48,8 +51,10 @@ function Dom() {
                 project.setId(index);
                 const div = document.createElement('div');
 
-                const projectbutton = createBtn(project.getName())
-
+                const projectbutton = createBtn(project.getName());
+                projectbutton.addEventListener('click', () => {
+                    loadProjectPage(index);
+                })
 
                 const renamebutton = createBtn("RENAME");
                 renamebutton.addEventListener('click', () => {
@@ -70,6 +75,73 @@ function Dom() {
 
             }
         )
+    }
+
+    const clearProjectPage = () => {
+        while (maincontent.firstChild) {
+            maincontent.firstChild.remove();
+        }
+    }
+
+    const loadProjectPage = (index) => {
+        clearProjectPage();
+
+        const maindiv = document.createElement('div');
+        const todocontainer = document.createElement('div');
+        const project = pm.getProjectList()[index];
+        const todolist = project.getToDoList();
+        todolist.forEach(
+            function(todo, index) {
+                const div = document.createElement('div');
+                div.textContent = todo.getTitle();
+                todo.setId(index);
+                todocontainer.appendChild(div);
+            }
+        )
+
+        const addtodobtn = createBtn("Add New Task");
+        addtodobtn.addEventListener('click', () => {
+            createToDoForm(index);
+            tododialog.showModal();
+        })
+
+        maindiv.appendChild(todocontainer);
+        maindiv.appendChild(addtodobtn);
+        maincontent.appendChild(maindiv);
+    }
+
+    const createToDoForm = (index) => {
+
+        const form = tododialog.querySelector('form');
+        const title = form.querySelector('#title');
+        const dueDate = form.querySelector('#duedate');
+        const priority = form.querySelector('#priority');
+        const description = form.querySelector('#description');
+        const previousbuttons = form.querySelector('.submitbtn');
+        previousbuttons.remove();
+
+        const newbuttons = document.createElement('div');
+        newbuttons.classList.add('submitbtn');
+        const addbtn = createBtn("ADD");
+        const cancel = createBtn("CANCEL");
+        newbuttons.appendChild(addbtn);
+        newbuttons.appendChild(cancel);
+        form.appendChild(newbuttons);
+
+        form.addEventListener('submit', (e) => {
+            const todo = ToDo(title.value, dueDate.value, priority.value, description.value);
+            const project = pm.getProjectList()[index];
+            project.addToDo(todo);
+            e.preventDefault();
+            tododialog.close();
+            form.reset();
+            loadProjectPage(index);
+        })
+        cancel.addEventListener('click', (e) => {
+            e.preventDefault();
+            tododialog.close();
+            form.reset();
+        })
     }
 
     const createDeleteForm = (index) => {
@@ -95,6 +167,7 @@ function Dom() {
         yes.addEventListener('click', () => {
             pm.removeProject(index);
             updateProjectDom();
+            clearProjectPage();
             projectdelete.close();
         })
         no.addEventListener('click', () => {
