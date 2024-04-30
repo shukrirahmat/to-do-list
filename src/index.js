@@ -1,4 +1,4 @@
 import "./styles.css";
-import { domInitialSetup } from "./dom";
+import dom from "./dom";
 
-domInitialSetup();
+dom.initialSetup();

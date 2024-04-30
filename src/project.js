@@ -5,8 +5,9 @@ function Project(name) {
     const setId = (newId) => {id = newId};
     const getId = () => id; 
     const getName = () => name;
+    const setName = (newname) => {name = newname}
 
-    return {getName, setId, getId};
+    return {getName, setId, getId, setName};
 }
 
 export default Project;

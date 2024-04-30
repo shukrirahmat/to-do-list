@@ -28,7 +28,26 @@
     <div id="maincontent">
         <div></div>
     </div>
-    <dialog>
+    <dialog id="projectdialog">
+        <form id="projectform">
+            <div>
+                <p>Enter the project's name</p>
+                <input type="text" id="projectname" name="projectname" required>
+            </div>
+            <div>
+                <button class="confirm">Create</button>
+                <button class="cancel">Cancel</button>
+            </div>
+        </form>
+    </dialog>
+    <dialog id="projectrename">
+        <p>Enter the project's new name</p>
+        <form></form>
+    </dialog>
+    <dialog id="projectdelete">
+        <div></div>
+    </dialog>
+    <dialog id="tododialog">
         <form>
             <div>
                 <label for="title">TITLE</label>
@@ -48,7 +67,8 @@
             </div>
             <div>
                 <label for="description">DESCRIPTION</label>
-                <textarea id="description" name="description" placeholder="Write something.." style="height:200px"></textarea>
+                <textarea id="description" name="description" placeholder="Write something.."
+                    style="height:200px"></textarea>
             </div>
             <div>
                 <button class="confirm">Add</button>
