@@ -15,19 +15,28 @@ function Dom() {
     const maincontent = document.querySelector('#maincontent');
     const tododialog = document.querySelector('#tododialog');
 
-    const initialSetup = () => {
+    function initialSetup () {
         projectDialogSetup();
-        addprojectbtn.addEventListener('click', () => {
-            projectdialog.showModal();
-        })
+
+        //Starting Example
+        let exampleproject = Project("Example Project");
+        pm.addProject(exampleproject);
+        refreshProjectList();
+        let exampletaskA = ToDo('Task A', '2020-05-15', 'low', "lorem");
+        let exampletaskB = ToDo('Task B', '2020-06-25', 'normal', "ipsum");
+        let exampletaskC = ToDo('Task C', '2020-12-01', 'high', "abcdef");
+        exampleproject.addToDo(exampletaskA);
+        exampleproject.addToDo(exampletaskB);
+        exampleproject.addToDo(exampletaskC);
+        loadProjectPage(0);
     }
 
-    const projectDialogSetup = () => {
+    function projectDialogSetup() {
         projectform.addEventListener('submit', (e) => {
             const name = projectnameinput.value;
             const newproject = Project(name);
             pm.addProject(newproject);
-            updateProjectDom();
+            refreshProjectList();
             e.preventDefault();
             projectdialog.close();
             projectnameinput.value = "";
@@ -38,9 +47,13 @@ function Dom() {
             projectdialog.close();
             projectnameinput.value = "";
         })
+
+        addprojectbtn.addEventListener('click', () => {
+            projectdialog.showModal();
+        })
     }
 
-    const updateProjectDom = () => {
+    function refreshProjectList() {
 
         while (projectcontainer.firstChild) {
             projectcontainer.firstChild.remove();
@@ -77,13 +90,13 @@ function Dom() {
         )
     }
 
-    const clearProjectPage = () => {
+    function clearProjectPage() {
         while (maincontent.firstChild) {
             maincontent.firstChild.remove();
         }
     }
 
-    const loadProjectPage = (index) => {
+    function loadProjectPage(index) {
         clearProjectPage();
 
         const maindiv = document.createElement('div');
@@ -94,8 +107,8 @@ function Dom() {
 
         projectName.textContent = project.getName();
 
-        todolist.forEach(function(todo, index) {
-            const div = createToDoDom(todo, index);
+        todolist.forEach(function(todo, id) {
+            const div = createToDoDom(todo, id);
             todocontainer.appendChild(div);
         });
 
@@ -111,7 +124,7 @@ function Dom() {
         maincontent.appendChild(maindiv);
     }
 
-    const createToDoForm = (index) => {
+    function createToDoForm(index) {
 
         const todoinputs = tododialog.querySelector('#todoinputs');
         const title = todoinputs.querySelector('#title');
@@ -150,7 +163,7 @@ function Dom() {
         })
     }
 
-    const createDeleteForm = (index) => {
+    function createDeleteForm (index) {
         const previousdiv = projectdelete.querySelector('div');
         previousdiv.remove();
 
@@ -172,7 +185,7 @@ function Dom() {
 
         yes.addEventListener('click', () => {
             pm.removeProject(index);
-            updateProjectDom();
+            refreshProjectList();
             clearProjectPage();
             projectdelete.close();
         })
@@ -181,7 +194,7 @@ function Dom() {
         })
     }
 
-    const createRenameForm = (index) => {
+    function createRenameForm(index) {
         const previousform = projectrename.querySelector('form');
         previousform.remove();
 
@@ -204,7 +217,7 @@ function Dom() {
         input.value = project.getName();
         newform.addEventListener('submit', (e) => {
             project.setName(input.value);
-            updateProjectDom();
+            refreshProjectList();
             e.preventDefault();
             projectrename.close();
         })
@@ -214,47 +227,65 @@ function Dom() {
         })
     }
 
+    function createBtn(text) {
+        const btn = document.createElement('button');
+        btn.textContent = text;
+        return btn;
+    }
+    
+    function createToDoDom(todo, index) {
+        todo.setId(index);
+        const container = document.createElement('div');
+        const title = document.createElement('div');
+        const dueDate = document.createElement('div');
+    
+        container.classList.add('todos');
+        title.textContent = todo.getTitle();
+        dueDate.textContent = todo.getDate();
+
+        setPriorityColor(container, todo);
+        const viewbutton = createviewButton(container, todo, index);
+    
+        container.appendChild(title);
+        container.appendChild(dueDate);
+        container.appendChild(viewbutton);
+        
+        return container;
+    }
+
+    function createviewButton(div, todo,index) {
+        const button = createBtn("VIEW");
+        const description = document.createElement('div');
+        description.textContent = todo.getDescription();
+        description.classList.add('description');
+        button.addEventListener('click', () => {
+            if (div.lastChild.classList.contains('description')) {
+                div.lastChild.remove();
+            } else {
+                div.appendChild(description);
+            }
+        })
+        return button;
+    }
+    
+    function setPriorityColor(div, todo) {
+        div.classList.remove('plow');
+        div.classList.remove('pnormal');
+        div.classList.remove('phigh');
+
+        const priority = todo.getPriority();
+    
+        if (priority === 'high') {
+            div.classList.add('phigh');
+        } else if (priority === 'normal') {
+            div.classList.add('pnormal');
+        } else if (priority === 'low') {
+            div.classList.add('plow');
+        }
+    }
+
     return {
         initialSetup
-    }
-}
-
-function createBtn(text) {
-    const btn = document.createElement('button');
-    btn.textContent = text;
-    return btn;
-}
-
-function createToDoDom(todo, index) {
-    todo.setId(index);
-    const div = document.createElement('div');
-    const title = document.createElement('div');
-    const dueDate = document.createElement('div');
-
-    div.classList.add('todos');
-    title.textContent = todo.getTitle();
-    dueDate.textContent = todo.getDate();
-
-    const priority = todo.getPriority();
-    setPriorityColor(div, priority);
-
-    div.appendChild(title);
-    div.appendChild(dueDate);
-    
-    return div;
-}
-
-function setPriorityColor(div, priority) {
-    div.classList.remove('plow');
-    div.classList.remove('pnormal');
-    div.classList.remove('phigh');
-
-    if (priority === 'high') {
-        div.classList.add('phigh');
-    } else if (priority === 'normal') {
-        div.classList.add('pnormal');
-    } else if (priority === 'low') {
-        div.classList.add('plow');
     }
 }
 
