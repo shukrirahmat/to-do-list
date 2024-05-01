@@ -16,13 +16,13 @@ function Dom() {
     const tododialog = document.querySelector('#tododialog');
 
     const initialSetup = () => {
-        dialogSetup();
+        projectDialogSetup();
         addprojectbtn.addEventListener('click', () => {
             projectdialog.showModal();
         })
     }
 
-    const dialogSetup = () => {
+    const projectDialogSetup = () => {
         projectform.addEventListener('submit', (e) => {
             const name = projectnameinput.value;
             const newproject = Project(name);
@@ -87,17 +87,17 @@ function Dom() {
         clearProjectPage();
 
         const maindiv = document.createElement('div');
+        const projectName = document.createElement('h2');
         const todocontainer = document.createElement('div');
         const project = pm.getProjectList()[index];
         const todolist = project.getToDoList();
-        todolist.forEach(
-            function(todo, index) {
-                const div = document.createElement('div');
-                div.textContent = todo.getTitle();
-                todo.setId(index);
-                todocontainer.appendChild(div);
-            }
-        )
+
+        projectName.textContent = project.getName();
+
+        todolist.forEach(function(todo, index) {
+            const div = createToDoDom(todo, index);
+            todocontainer.appendChild(div);
+        });
 
         const addtodobtn = createBtn("Add New Task");
         addtodobtn.addEventListener('click', () => {
@@ -105,6 +105,7 @@ function Dom() {
             tododialog.showModal();
         })
 
+        maindiv.appendChild(projectName);
         maindiv.appendChild(todocontainer);
         maindiv.appendChild(addtodobtn);
         maincontent.appendChild(maindiv);
@@ -112,35 +113,40 @@ function Dom() {
 
     const createToDoForm = (index) => {
 
-        const form = tododialog.querySelector('form');
-        const title = form.querySelector('#title');
-        const dueDate = form.querySelector('#duedate');
-        const priority = form.querySelector('#priority');
-        const description = form.querySelector('#description');
-        const previousbuttons = form.querySelector('.submitbtn');
-        previousbuttons.remove();
+        const todoinputs = tododialog.querySelector('#todoinputs');
+        const title = todoinputs.querySelector('#title');
+        const dueDate = todoinputs.querySelector('#duedate');
+        const priority = todoinputs.querySelector('#priority');
+        const description = todoinputs.querySelector('#description');
 
+        const previousform = tododialog.querySelector('form');
+        previousform.remove();
+
+        const newform = document.createElement('form');
         const newbuttons = document.createElement('div');
         newbuttons.classList.add('submitbtn');
         const addbtn = createBtn("ADD");
         const cancel = createBtn("CANCEL");
         newbuttons.appendChild(addbtn);
         newbuttons.appendChild(cancel);
-        form.appendChild(newbuttons);
 
-        form.addEventListener('submit', (e) => {
+        newform.appendChild(todoinputs);
+        newform.appendChild(newbuttons);
+        tododialog.appendChild(newform);
+
+        newform.addEventListener('submit', (e) => {
             const todo = ToDo(title.value, dueDate.value, priority.value, description.value);
             const project = pm.getProjectList()[index];
             project.addToDo(todo);
             e.preventDefault();
             tododialog.close();
-            form.reset();
+            newform.reset();
             loadProjectPage(index);
         })
         cancel.addEventListener('click', (e) => {
             e.preventDefault();
             tododialog.close();
-            form.reset();
+            newform.reset();
         })
     }
 
@@ -217,6 +223,39 @@ function createBtn(text) {
     const btn = document.createElement('button');
     btn.textContent = text;
     return btn;
+}
+
+function createToDoDom(todo, index) {
+    todo.setId(index);
+    const div = document.createElement('div');
+    const title = document.createElement('div');
+    const dueDate = document.createElement('div');
+
+    div.classList.add('todos');
+    title.textContent = todo.getTitle();
+    dueDate.textContent = todo.getDate();
+
+    const priority = todo.getPriority();
+    setPriorityColor(div, priority);
+
+    div.appendChild(title);
+    div.appendChild(dueDate);
+    
+    return div;
+}
+
+function setPriorityColor(div, priority) {
+    div.classList.remove('plow');
+    div.classList.remove('pnormal');
+    div.classList.remove('phigh');
+
+    if (priority === 'high') {
+        div.classList.add('phigh');
+    } else if (priority === 'normal') {
+        div.classList.add('pnormal');
+    } else if (priority === 'low') {
+        div.classList.add('plow');
+    }
 }
 
 const dom = Dom();

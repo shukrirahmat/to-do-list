@@ -40,3 +40,26 @@ nav {
 button {
     text-align: left;
 }
+
+.todos {
+    display: flex;
+    flex-direction: row;
+    color:rgba(0, 0, 0, 0.2);
+    background-color: darkgray;
+    gap: 20px;
+}
+
+.todos.plow {
+    color: white;
+    background-color: green;
+}
+
+.todos.pnormal {
+    color: white;
+    background-color: orange;
+}
+
+.todos.phigh {
+    color: white;
+    background-color: crimson;
+}
