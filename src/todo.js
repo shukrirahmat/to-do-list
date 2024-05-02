@@ -1,6 +1,6 @@
 function ToDo(title, dueDate, priority, description) {
 
-    let checklist = false;
+    let check = false;
     let id;
 
     const getTitle = () => title;
@@ -8,9 +8,36 @@ function ToDo(title, dueDate, priority, description) {
     const getPriority = () => priority;
     const getDescription = () => description;
     const getId = () => id;
-    const setId = (newId) => {id = newId};
-
+    const getCheck = () => check;
+    const setId = (newId) => { id = newId };
     
-    return {getTitle, getId, setId, getDate, getPriority, getDescription};
+    function toggleCheck(checkbox) {
+        if (checkbox.checked) {
+            check = true;
+        } else {
+            check = false;
+        }
+    }
+
+    function edit(newtodo) {
+        title = newtodo.getTitle();
+        dueDate = newtodo.getDate();
+        priority = newtodo.getPriority();
+        description = newtodo.getDescription();
+    }
+
+
+
+    return {
+        getTitle,
+        getId,
+        setId,
+        getDate,
+        getPriority,
+        getDescription,
+        getCheck,
+        toggleCheck,
+        edit
+    };
 }
 export default ToDo;
