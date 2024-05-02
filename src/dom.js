@@ -266,7 +266,7 @@ function Dom() {
 
         setToDoColor(container, todo);
         const viewbutton = createToDoViewButton(container, todo);
-        const checkbox = createToDoCheckBox(container, todo);
+        const checkbox = createToDoCheckBox(container, todo, index);
         const editbutton = createToDoEditButton(todo, project);
 
         container.appendChild(title);
@@ -278,9 +278,10 @@ function Dom() {
         return container;
     }
 
-    function createToDoCheckBox(div, todo) {
+    function createToDoCheckBox(div, todo, index) {
         const checkbox = document.createElement('input');
         checkbox.setAttribute('type', 'checkbox');
+        checkbox.setAttribute('id', 'check' + index);
         if (todo.getCheck()) {
             checkbox.checked = true;
         }
