@@ -42,11 +42,19 @@ button {
 }
 
 .todos {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: 5fr 1fr 1fr 1fr 1fr 1fr;
     color:rgba(0, 0, 0, 0.2);
     background-color: darkgray;
-    gap: 20px;
+    column-gap: 20px;
+}
+
+.description {
+    grid-column: 1/-1;
+    font-size: 24px;
+    background-color: white;
+    margin: 10px 10px;
+    color: black !important;
 }
 
 .todos.plow {

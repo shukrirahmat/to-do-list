@@ -10,8 +10,8 @@ function Dom() {
     const projectform = document.querySelector('#projectform');
     const projectnameinput = document.querySelector('#projectform input')
     const projectcancel = document.querySelector('#projectform .cancel');
-    const projectrename = document.querySelector('#projectrename');
-    const projectdelete = document.querySelector('#projectdelete');
+    const renamedialog = document.querySelector('#renamedialog');
+    const deletedialog = document.querySelector('#deletedialog');
     const maincontent = document.querySelector('#maincontent');
     const tododialog = document.querySelector('#tododialog');
 
@@ -72,13 +72,13 @@ function Dom() {
                 const renamebutton = createBtn("RENAME");
                 renamebutton.addEventListener('click', () => {
                     createProjectRenameForm(index);
-                    projectrename.showModal();
+                    renamedialog.showModal();
                 })
 
                 const deletebutton = createBtn("DELETE");
                 deletebutton.addEventListener('click', function () {
-                    createProjectDeleteForm(index);
-                    projectdelete.showModal();
+                    createDeleteForm(index);
+                    deletedialog.showModal();
                 })
 
                 div.appendChild(projectbutton);
@@ -183,12 +183,18 @@ function Dom() {
     }
 
 
-    function createProjectDeleteForm(index) {
-        const previousdiv = projectdelete.querySelector('div');
+    function createDeleteForm(index, todo=false) {
+        const previousdiv = deletedialog.querySelector('div');
         previousdiv.remove();
 
         const project = pm.getProjectList()[index];
-        const text = `Delete project "${project.getName()}"?`;
+        let text;
+
+        if (todo === false) {
+            text = `Delete project "${project.getName()}"?`;
+        } else {
+            text = `Delete task "${todo.getTitle()}"?`;
+        }
 
         const outsidediv = document.createElement('div');
         const p = document.createElement('p');
@@ -201,21 +207,30 @@ function Dom() {
         innerdiv.appendChild(no);
         outsidediv.appendChild(p);
         outsidediv.appendChild(innerdiv);
-        projectdelete.appendChild(outsidediv);
+        deletedialog.appendChild(outsidediv);
 
-        yes.addEventListener('click', () => {
-            pm.removeProject(index);
-            refreshProjectList();
-            clearProjectPage();
-            projectdelete.close();
-        })
+        if (todo === false) {
+            yes.addEventListener('click', () => {
+                pm.removeProject(index);
+                refreshProjectList();
+                clearProjectPage();
+                deletedialog.close();
+            })
+        } else {
+            yes.addEventListener('click', () => {
+                project.removeToDo(todo);
+                deletedialog.close();
+                loadProjectPage(project.getId());
+            })
+        }
+
         no.addEventListener('click', () => {
-            projectdelete.close();
+            deletedialog.close();
         })
     }
 
     function createProjectRenameForm(index) {
-        const previousform = projectrename.querySelector('form');
+        const previousform = renamedialog.querySelector('form');
         previousform.remove();
 
         const newform = document.createElement('form');
@@ -228,7 +243,7 @@ function Dom() {
         div.appendChild(cancel);
         newform.appendChild(input);
         newform.appendChild(div);
-        projectrename.appendChild(newform);
+        renamedialog.appendChild(newform);
 
         const project = pm.getProjectList()[index];
 
@@ -239,11 +254,11 @@ function Dom() {
             project.setName(input.value);
             refreshProjectList();
             e.preventDefault();
-            projectrename.close();
+            renamedialog.close();
         })
         cancel.addEventListener('click', (e) => {
             e.preventDefault();
-            projectrename.close();
+            renamedialog.close();
         })
     }
 
@@ -268,12 +283,14 @@ function Dom() {
         const viewbutton = createToDoViewButton(container, todo);
         const checkbox = createToDoCheckBox(container, todo, index);
         const editbutton = createToDoEditButton(todo, project);
+        const deletebutton = createToDoDeleteButton(todo, project);
 
         container.appendChild(title);
         container.appendChild(dueDate);
         container.appendChild(checkbox);
         container.appendChild(viewbutton);
         container.appendChild(editbutton);
+        container.appendChild(deletebutton);
 
         return container;
     }
@@ -312,6 +329,16 @@ function Dom() {
         button.addEventListener('click', (e) => {
             createToDoForm(project.getId(), todo);
             tododialog.showModal();
+        })
+
+        return button;
+    }
+
+    function createToDoDeleteButton(todo, project) {
+        const button = createBtn("DELETE");
+        button.addEventListener('click', (e) => {
+            createDeleteForm(project.getId(), todo);
+            deletedialog.showModal();
         })
 
         return button;
