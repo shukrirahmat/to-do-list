@@ -206,7 +206,7 @@ function Dom() {
         }
 
         const newform = document.createElement('form');
-        const p = document.createElement('p');
+        const p = document.createElement('div');
         p.textContent = text;
         const innerdiv = document.createElement('div');
         innerdiv.classList.add("submitbtn");
@@ -217,7 +217,7 @@ function Dom() {
         innerdiv.appendChild(no);
         newform.appendChild(p);
         newform.appendChild(innerdiv);
-        deletedialog.appendChild(outsidediv);
+        deletedialog.appendChild(newform);
 
         if (todo === false) {
             newform.addEventListener('submit', (e) => {
@@ -247,15 +247,24 @@ function Dom() {
         previousform.remove();
 
         const newform = document.createElement('form');
+        const label = document.createElement('label');
+        label.textContent = "Enter new name";
+        label.setAttribute("for", "renameinput");
         const input = document.createElement('input');
-        const div = document.createElement('div');
+        input.setAttribute("id", "renameinput");
+        input.setAttribute("name", "renameinput");
+        const div1 = document.createElement('div');
+        const div2 = document.createElement('div');
+        div2.classList.add("submitbtn");
         const confirm = createBtn("RENAME");
         const cancel = createBtn("CANCEL");
 
-        div.appendChild(confirm);
-        div.appendChild(cancel);
-        newform.appendChild(input);
-        newform.appendChild(div);
+        div1.appendChild(label);
+        div1.appendChild(input);
+        div2.appendChild(confirm);
+        div2.appendChild(cancel);
+        newform.appendChild(div1);
+        newform.appendChild(div2);
         renamedialog.appendChild(newform);
 
         const project = pm.getProjectList()[index];
@@ -292,6 +301,7 @@ function Dom() {
         title.textContent = todo.getTitle();
         title.classList.add("todotitle");
         dueDate.textContent = todo.getDate();
+        dueDate.classList.add("tododate");
 
         setToDoColor(container, todo);
         const viewbutton = createToDoViewButton(container, todo);
