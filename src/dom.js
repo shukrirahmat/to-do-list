@@ -22,9 +22,9 @@ function Dom() {
         let exampleproject = Project("Example Project");
         pm.addProject(exampleproject);
         refreshProjectList();
-        let exampletaskA = ToDo('Task A', '2020-05-15', 'low', "lorem");
-        let exampletaskB = ToDo('Task B', '2020-06-25', 'normal', "ipsum");
-        let exampletaskC = ToDo('Task C', '2020-12-01', 'high', "abcdef");
+        let exampletaskA = ToDo('Task A', '2020-05-15', 'low', "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+        let exampletaskB = ToDo('Task B', '2020-06-25', 'normal', "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.");
+        let exampletaskC = ToDo('Task C', '2020-12-01', 'high', "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.");
         exampleproject.addToDo(exampletaskA);
         exampleproject.addToDo(exampletaskB);
         exampleproject.addToDo(exampletaskC);
@@ -104,6 +104,7 @@ function Dom() {
         const maindiv = document.createElement('div');
         const projectName = document.createElement('h2');
         const todocontainer = document.createElement('div');
+        todocontainer.classList.add("todocontainer");
         const project = pm.getProjectList()[index];
         const todolist = project.getToDoList();
 
@@ -114,7 +115,8 @@ function Dom() {
             todocontainer.appendChild(div);
         });
 
-        const addtodobtn = createBtn("Add New Task");
+        const addtodobtn = createBtn("Add New");
+        addtodobtn.classList.add("addnewbtn");
         addtodobtn.addEventListener('click', () => {
             createToDoForm(index);
             tododialog.showModal();
@@ -182,12 +184,17 @@ function Dom() {
             tododialog.close();
             newform.reset();
         })
+
+        setToDoDialogColor(tododialog, priority.value);
+        priority.addEventListener('change', () => {
+            setToDoDialogColor(tododialog, priority.value);
+        })
     }
 
 
     function createDeleteForm(index, todo=false) {
-        const previousdiv = deletedialog.querySelector('div');
-        previousdiv.remove();
+        const previousform = deletedialog.querySelector('form');
+        previousform.remove();
 
         const project = pm.getProjectList()[index];
         let text;
@@ -198,35 +205,39 @@ function Dom() {
             text = `Delete task "${todo.getTitle()}"?`;
         }
 
-        const outsidediv = document.createElement('div');
+        const newform = document.createElement('form');
         const p = document.createElement('p');
         p.textContent = text;
         const innerdiv = document.createElement('div');
+        innerdiv.classList.add("submitbtn");
         const yes = createBtn("YES");
         const no = createBtn("NO");
 
         innerdiv.appendChild(yes);
         innerdiv.appendChild(no);
-        outsidediv.appendChild(p);
-        outsidediv.appendChild(innerdiv);
+        newform.appendChild(p);
+        newform.appendChild(innerdiv);
         deletedialog.appendChild(outsidediv);
 
         if (todo === false) {
-            yes.addEventListener('click', () => {
+            newform.addEventListener('submit', (e) => {
                 pm.removeProject(index);
+                e.preventDefault();
+                deletedialog.close();
                 refreshProjectList();
                 clearProjectPage();
-                deletedialog.close();
             })
         } else {
-            yes.addEventListener('click', () => {
+            newform.addEventListener('submit', (e) => {
                 project.removeToDo(todo);
+                e.preventDefault();
                 deletedialog.close();
                 loadProjectPage(project.getId());
             })
         }
 
-        no.addEventListener('click', () => {
+        no.addEventListener('click', (e) => {
+            e.preventDefault();
             deletedialog.close();
         })
     }
@@ -279,6 +290,7 @@ function Dom() {
 
         container.classList.add('todos');
         title.textContent = todo.getTitle();
+        title.classList.add("todotitle");
         dueDate.textContent = todo.getDate();
 
         setToDoColor(container, todo);
@@ -287,9 +299,9 @@ function Dom() {
         const editbutton = createToDoEditButton(todo, project);
         const deletebutton = createToDoDeleteButton(todo, project);
 
+        container.appendChild(checkbox);
         container.appendChild(title);
         container.appendChild(dueDate);
-        container.appendChild(checkbox);
         container.appendChild(viewbutton);
         container.appendChild(editbutton);
         container.appendChild(deletebutton);
@@ -362,6 +374,20 @@ function Dom() {
             } else if (priority === 'low') {
                 div.classList.add('plow');
             }
+        }
+    }
+
+    function setToDoDialogColor(div, priority) {
+        div.classList.remove('plow');
+        div.classList.remove('pnormal');
+        div.classList.remove('phigh');
+
+        if (priority === 'high') {
+            div.classList.add('phigh');
+        } else if (priority === 'normal') {
+            div.classList.add('pnormal');
+        } else if (priority === 'low') {
+            div.classList.add('plow');
         }
     }
 

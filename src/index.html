@@ -22,7 +22,7 @@
             <h2>PROJECTS</h2>
             <nav class="projectcontainer">
             </nav>
-            <button id="addprojectbtn">+ Add Project</button>
+            <button id="addprojectbtn">Add Project</button>
         </div>
     </div>
     <div id="maincontent">
@@ -45,7 +45,7 @@
         <form></form>
     </dialog>
     <dialog id="deletedialog">
-        <div></div>
+        <form></form>
     </dialog>
     <dialog id="tododialog">
         <form>
@@ -55,21 +55,21 @@
                     <input type="text" id="title" name="title" required>
                 </div>
                 <div>
+                    <label for="description">DESCRIPTION</label>
+                    <textarea id="description" name="description" placeholder="Write something.."
+                        style="height:200px"></textarea>
+                </div>
+                <div>
                     <label for="duedate">DUEDATE</label>
                     <input type="date" id="duedate" name="duedate" required>
                 </div>
                 <div>
                     <label for="priority">PRIORITY</label>
                     <select id="priority" name="priority">
-                        <option value="low">LOW</option>
-                        <option value="normal">NORMAL</option>
-                        <option value="high">HIGH</option>
+                        <option value="low">Low</option>
+                        <option value="normal">Normal</option>
+                        <option value="high">High</option>
                     </select>
-                </div>
-                <div>
-                    <label for="description">DESCRIPTION</label>
-                    <textarea id="description" name="description" placeholder="Write something.."
-                        style="height:200px"></textarea>
                 </div>
             </div>
             <div class="submitbtn">
