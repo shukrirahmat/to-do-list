@@ -1,44 +1,123 @@
+@font-face {
+    font-family: "Roboto";
+    src: url(fonts/Roboto-Regular.ttf),
+    url(fonts/Roboto-Bold.ttf);
+}
+
+@font-face {
+    font-family: "TitanOne";
+    src: url(fonts/TitanOne-Regular.ttf);
+}
+
 * {
     box-sizing: border-box;
 }
 
 body {
     margin: 0;
-    padding: 0;
+    padding: 20px;
     height: 100vh;
     display: grid;
     grid-template-rows: 100px 1fr;
-    grid-template-columns: 250px 1fr;
+    grid-template-columns: 300px 1fr;
+    gap: 30px 40px;
+    background-image: url(image/background.jpg);
+    background-size: cover;
 }
 
 #header {
-    background-color: blue;
+    border-radius: 20px;
+    border: 5px solid slategray;
+    background-color: ghostwhite;
     grid-column: 1/-1;
+    font-family: "TitanOne", sans-serif;
+    font-size: 50px;
+    text-align: center;
+    padding: 10px 0;
 }
 
 #sidebar {
-    background-color: red;
+    background-color: ghostwhite;
     display: flex;
     flex-direction: column;
     gap: 50px;
+    border-radius: 20px;
+    border: 5px solid slategray;
+    font-family: "Roboto",sans-serif;
+    padding: 10px 20px;
+
 }
 
 #maincontent{
-    background-color: grey;
+    background-color: ghostwhite;
+    font-display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border-radius: 20px;
+    border: 5px solid slategray;
+    font-family: "Roboto",sans-serif;
+    padding: 10px 20px;
+}
+
+h2 {
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
 }
 
 #sidebar > div {
     display: flex;
     flex-direction: column;
+    gap: 10px;
 }
 
 nav {
     display: flex;
     flex-direction: column;
+    gap: 5px;
 }
 
-button {
+#sidebar button {
+    font-family: "Roboto", sans-serif;
+    border: none;
+    font-size: 16px;
     text-align: left;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+#sidebar button:hover {
+    background-color:cornflowerblue;
+    color: ghostwhite;
+}
+
+.projectcontainer div {
+    display: grid;
+    grid-template-columns: 1fr 30px 30px;
+}
+
+button.edit {
+    background-image: url(image/pencil.svg);
+    background-size: 80%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+button.edit:hover {
+    background-image: url(image/pencil.svg);
+    background-position: center;
+}
+
+button.delete {
+    background-image: url(image/delete.svg);
+    background-size: 80%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+button.delete:hover {
+    background-image: url(image/delete.svg);
+    background-position: center;
+    background-color: crimson !important;
 }
 
 .todos {

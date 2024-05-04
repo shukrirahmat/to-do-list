@@ -69,13 +69,15 @@ function Dom() {
                     loadProjectPage(index);
                 })
 
-                const renamebutton = createBtn("RENAME");
+                const renamebutton = createBtn("");
+                renamebutton.classList.add("edit");
                 renamebutton.addEventListener('click', () => {
                     createProjectRenameForm(index);
                     renamedialog.showModal();
                 })
 
-                const deletebutton = createBtn("DELETE");
+                const deletebutton = createBtn("");
+                deletebutton.classList.add("delete");
                 deletebutton.addEventListener('click', function () {
                     createDeleteForm(index);
                     deletedialog.showModal();
