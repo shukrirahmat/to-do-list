@@ -4,6 +4,12 @@ import ToDo from "./todo";
 
 function Dom() {
 
+    let currentPage = 0;
+
+    const allbtn = document.querySelector('#allbtn');
+    const todaybtn = document.querySelector("#today");
+    const weekbtn = document.querySelector("#thisweek");
+    const monthbtn = document.querySelector("#thismonth")
     const addprojectbtn = document.querySelector('#addprojectbtn');
     const projectcontainer = document.querySelector('.projectcontainer');
     const projectdialog = document.querySelector('#projectdialog');
@@ -16,6 +22,7 @@ function Dom() {
     const tododialog = document.querySelector('#tododialog');
 
     function initialSetup() {
+        projectFilterSetup();
         projectDialogSetup();
 
         //Starting Example
@@ -28,7 +35,7 @@ function Dom() {
         exampleproject.addToDo(exampletaskA);
         exampleproject.addToDo(exampletaskB);
         exampleproject.addToDo(exampletaskC);
-        loadProjectPage(0);
+        refreshMain();
     }
 
     function projectDialogSetup() {
@@ -40,6 +47,9 @@ function Dom() {
             e.preventDefault();
             projectdialog.close();
             projectnameinput.value = "";
+
+            changeProject(newproject.getId());
+            refreshMain();
         })
 
         projectcancel.addEventListener('click', (e) => {
@@ -51,6 +61,48 @@ function Dom() {
         addprojectbtn.addEventListener('click', () => {
             projectdialog.showModal();
         })
+    }
+
+    function sidebarClear() {
+        const fbuttons = [allbtn, todaybtn, weekbtn, monthbtn];
+        fbuttons.forEach(
+            function (node) {
+                node.classList.remove("blue")
+            }
+        )
+
+        const pbuttons = projectcontainer.querySelectorAll('button');
+        pbuttons.forEach(
+            function (node) {
+                node.classList.remove("blue")
+            }
+        )
+    }
+
+    function sidebarBgColor(btn) {
+        sidebarClear();
+        btn.classList.add('blue');
+    }
+
+    function projectFilterSetup() {
+        const buttons = [allbtn, todaybtn, weekbtn, monthbtn];
+        const str = ['all', 'today', 'week', 'month']
+        buttons.forEach(
+            function (button, index) {
+                const keyword = str[index]
+                button.addEventListener('click', () => {
+                    currentPage = keyword;
+                    sidebarBgColor(button);
+                    refreshMain();
+
+                })
+            }
+        )
+    }
+
+    function changeProject(index) {
+        currentPage = index;
+        refreshProjectList();
     }
 
     function refreshProjectList() {
@@ -66,20 +118,21 @@ function Dom() {
 
                 const projectbutton = createBtn(project.getName());
                 projectbutton.addEventListener('click', () => {
-                    loadProjectPage(index);
+                    changeProject(index);
+                    refreshMain();
                 })
 
                 const renamebutton = createBtn("");
                 renamebutton.classList.add("edit");
                 renamebutton.addEventListener('click', () => {
-                    createProjectRenameForm(index);
+                    createProjectRenameForm(project);
                     renamedialog.showModal();
                 })
 
                 const deletebutton = createBtn("");
                 deletebutton.classList.add("delete");
                 deletebutton.addEventListener('click', function () {
-                    createDeleteForm(index);
+                    createDeleteForm(project);
                     deletedialog.showModal();
                 })
 
@@ -90,45 +143,94 @@ function Dom() {
 
             }
         )
+        const projectdivs = projectcontainer.querySelectorAll('div');
+        projectdivs.forEach(
+            function(node, index) {
+                if (currentPage === index) {
+                    const buttontocolor = node.querySelector('button');
+                    sidebarBgColor(buttontocolor);
+                }
+            }
+        )
     }
 
-    function clearProjectPage() {
+    function clearMain() {
         while (maincontent.firstChild) {
             maincontent.firstChild.remove();
         }
     }
 
-    function loadProjectPage(index) {
-        clearProjectPage();
+    function refreshMain() {
+        clearMain();
 
-        const maindiv = document.createElement('div');
+        if (currentPage === "all") {
+            maincontent.append(createAllPage());
+        } else if (currentPage === "today") {
+            maincontent.textContent = "OK";
+        } else if (currentPage === "week") {
+            maincontent.textContent = "all right";
+        } else if (currentPage === "month") {
+            maincontent.textContent = "aha";
+        } else {
+            const project = pm.getProjectList()[currentPage];
+            maincontent.append(createProjectPage(project));
+        }
+    }
+
+    function createAllPage() {
+        const page = document.createElement('div');
+        const header = document.createElement('h2');
+        header.textContent = "All To-Dos"
+        const todocontainer = document.createElement('div');
+        todocontainer.classList.add("todocontainer");
+
+        pm.getProjectList().forEach(
+            function (project) {
+                project.getToDoList().forEach(
+                    function (todo) {
+                        const div = createToDoMain(project, todo);
+                        todocontainer.appendChild(div);
+                    }
+                )
+            }
+        )
+
+        page.appendChild(header);
+        page.appendChild(todocontainer);
+
+        return page;
+    }
+
+    function createProjectPage(project) {
+
+        const page = document.createElement('div');
         const projectName = document.createElement('h2');
         const todocontainer = document.createElement('div');
         todocontainer.classList.add("todocontainer");
-        const project = pm.getProjectList()[index];
         const todolist = project.getToDoList();
 
         projectName.textContent = project.getName();
 
-        todolist.forEach(function (todo, id) {
-            const div = createToDoMain(todo, id, project);
+        todolist.forEach(function (todo, index) {
+            todo.setId(index);
+            const div = createToDoMain(project, todo);
             todocontainer.appendChild(div);
         });
 
         const addtodobtn = createBtn("Add New");
         addtodobtn.classList.add("addnewbtn");
         addtodobtn.addEventListener('click', () => {
-            createToDoForm(index);
+            createToDoForm(project);
             tododialog.showModal();
         })
 
-        maindiv.appendChild(projectName);
-        maindiv.appendChild(todocontainer);
-        maindiv.appendChild(addtodobtn);
-        maincontent.appendChild(maindiv);
+        page.appendChild(projectName);
+        page.appendChild(todocontainer);
+        page.appendChild(addtodobtn);
+        return page;
     }
 
-    function createToDoForm(index, toedit=false) {
+    function createToDoForm(project, toedit = false) {
 
         const todoinputs = tododialog.querySelector('#todoinputs');
         const title = todoinputs.querySelector('#title');
@@ -156,7 +258,7 @@ function Dom() {
             title.value = toedit.getTitle();
             dueDate.value = toedit.getDate();
             priority.value = toedit.getPriority();
-            description.value = toedit.getDescription(); 
+            description.value = toedit.getDescription();
 
             newform.addEventListener('submit', (e) => {
                 const todo = ToDo(title.value, dueDate.value, priority.value, description.value);
@@ -164,18 +266,17 @@ function Dom() {
                 e.preventDefault();
                 tododialog.close();
                 newform.reset();
-                loadProjectPage(index);
+                refreshMain();
             })
 
         } else {
             newform.addEventListener('submit', (e) => {
                 const todo = ToDo(title.value, dueDate.value, priority.value, description.value);
-                const project = pm.getProjectList()[index];
                 project.addToDo(todo);
                 e.preventDefault();
                 tododialog.close();
                 newform.reset();
-                loadProjectPage(index);
+                refreshMain();
             })
         }
 
@@ -191,12 +292,9 @@ function Dom() {
         })
     }
 
-
-    function createDeleteForm(index, todo=false) {
+    function createDeleteForm(project, todo = false) {
         const previousform = deletedialog.querySelector('form');
         previousform.remove();
-
-        const project = pm.getProjectList()[index];
         let text;
 
         if (todo === false) {
@@ -221,18 +319,32 @@ function Dom() {
 
         if (todo === false) {
             newform.addEventListener('submit', (e) => {
-                pm.removeProject(index);
+
+                let openedproject;
+                if (Number.isInteger(currentPage)) {
+                    openedproject = pm.getProjectList()[currentPage];
+                } else { openedproject = false; }
+
+                pm.removeProject(project.getId());
+                refreshProjectList();
                 e.preventDefault();
                 deletedialog.close();
-                refreshProjectList();
-                clearProjectPage();
+                if (currentPage === project.getId()) {
+                    clearMain();
+                    sidebarClear();
+                } else {
+                    if (openedproject) {
+                        changeProject(openedproject.getId());
+                    }
+                    refreshMain();
+                }
             })
         } else {
             newform.addEventListener('submit', (e) => {
                 project.removeToDo(todo);
                 e.preventDefault();
                 deletedialog.close();
-                loadProjectPage(project.getId());
+                refreshMain();
             })
         }
 
@@ -242,7 +354,7 @@ function Dom() {
         })
     }
 
-    function createProjectRenameForm(index) {
+    function createProjectRenameForm(project) {
         const previousform = renamedialog.querySelector('form');
         previousform.remove();
 
@@ -267,8 +379,6 @@ function Dom() {
         newform.appendChild(div2);
         renamedialog.appendChild(newform);
 
-        const project = pm.getProjectList()[index];
-
         input.setAttribute('type', 'text');
         input.setAttribute('required', "");
         input.value = project.getName();
@@ -290,8 +400,7 @@ function Dom() {
         return btn;
     }
 
-    function createToDoMain(todo, index, project) {
-        todo.setId(index);
+    function createToDoMain(project, todo) {
 
         const container = document.createElement('div');
         const title = document.createElement('div');
@@ -305,9 +414,9 @@ function Dom() {
 
         setToDoColor(container, todo);
         const viewbutton = createToDoViewButton(container, todo);
-        const checkbox = createToDoCheckBox(container, todo, index);
-        const editbutton = createToDoEditButton(todo, project);
-        const deletebutton = createToDoDeleteButton(todo, project);
+        const checkbox = createToDoCheckBox(container, todo);
+        const editbutton = createToDoEditButton(project, todo);
+        const deletebutton = createToDoDeleteButton(project, todo);
 
         container.appendChild(checkbox);
         container.appendChild(title);
@@ -319,10 +428,10 @@ function Dom() {
         return container;
     }
 
-    function createToDoCheckBox(div, todo, index) {
+    function createToDoCheckBox(div, todo) {
         const checkbox = document.createElement('input');
         checkbox.setAttribute('type', 'checkbox');
-        checkbox.setAttribute('id', 'check' + index);
+        checkbox.setAttribute('name', 'checkbox');
         if (todo.getCheck()) {
             checkbox.checked = true;
         }
@@ -348,20 +457,20 @@ function Dom() {
         return button;
     }
 
-    function createToDoEditButton(todo, project) {
+    function createToDoEditButton(project, todo) {
         const button = createBtn("EDIT");
         button.addEventListener('click', (e) => {
-            createToDoForm(project.getId(), todo);
+            createToDoForm(project, todo);
             tododialog.showModal();
         })
 
         return button;
     }
 
-    function createToDoDeleteButton(todo, project) {
+    function createToDoDeleteButton(project, todo) {
         const button = createBtn("DELETE");
         button.addEventListener('click', (e) => {
-            createDeleteForm(project.getId(), todo);
+            createDeleteForm(project, todo);
             deletedialog.showModal();
         })
 

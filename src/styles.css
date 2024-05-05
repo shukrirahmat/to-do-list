@@ -89,7 +89,13 @@ nav {
 }
 
 #sidebar button:hover {
-    box-shadow: 0px -4px 0px cornflowerblue inset; 
+    box-shadow: 0px -3px 0px slategray inset; 
+}
+
+#sidebar button.blue {
+    background-color: slategray;
+    border-radius: 10px;
+    color: ghostwhite;
 }
 
 .projectcontainer div {
@@ -180,7 +186,7 @@ button.delete:hover {
 }
 
 .addnewbtn:hover{
-    box-shadow: 0px -4px 0px cornflowerblue inset; 
+    box-shadow: 0px -4px 0px slategray inset; 
 }
 
 .todocontainer {
