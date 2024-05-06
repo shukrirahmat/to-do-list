@@ -21,6 +21,7 @@ body {
     grid-template-rows: 100px 1fr;
     grid-template-columns: 300px 1fr;
     gap: 30px 40px;
+    background-color: darkslategray;
     background-image: url(image/background.jpg);
     background-size: cover;
 }
@@ -130,8 +131,9 @@ button.delete:hover {
     background-color: gray;
     opacity: 0.2;
     border-radius: 5px;
-    font-size: 20px;
+    font-size: 18px;
     gap: 10px 20px;
+    align-items: center;
 }
 
 .todotitle {
@@ -166,6 +168,10 @@ button.delete:hover {
 .todos.phigh {
     opacity: 1;
     background-color: lightcoral;
+}
+
+.todos.overdue {
+    color: darkred;
 }
 
 #maincontent > div {

@@ -1,3 +1,5 @@
+import { isToday , differenceInCalendarDays} from "date-fns";
+
 function ToDo(title, dueDate, priority, description) {
 
     let check = false;
@@ -19,6 +21,25 @@ function ToDo(title, dueDate, priority, description) {
         }
     }
 
+    function isOverdue() {
+        let difference = differenceInCalendarDays(dueDate, new Date());
+        return difference <= -1
+    }
+
+    function isToDoToday() {
+        return isToday(dueDate);
+    }
+
+    function isInAWeek() {
+        let difference = differenceInCalendarDays(dueDate, new Date());
+        return ((difference < 8) && (!isOverdue()));
+    }
+
+    function isInAMonth() {
+        let difference = differenceInCalendarDays(dueDate, new Date());
+        return ((difference < 31) && (!isOverdue()));
+    }
+
     function edit(newtodo) {
         title = newtodo.getTitle();
         dueDate = newtodo.getDate();
@@ -37,7 +58,11 @@ function ToDo(title, dueDate, priority, description) {
         getDescription,
         getCheck,
         toggleCheck,
-        edit
+        edit,
+        isOverdue,
+        isToDoToday,
+        isInAWeek,
+        isInAMonth
     };
 }
 export default ToDo;

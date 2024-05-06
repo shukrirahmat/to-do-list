@@ -1,6 +1,7 @@
 import pm from "./projectManager";
 import Project from "./project";
 import ToDo from "./todo";
+import { add, format, formatDistanceToNowStrict } from "date-fns";
 
 function Dom() {
 
@@ -29,13 +30,16 @@ function Dom() {
         let exampleproject = Project("Example Project");
         pm.addProject(exampleproject);
         refreshProjectList();
-        let exampletaskA = ToDo('Task A', '2020-05-15', 'low', "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-        let exampletaskB = ToDo('Task B', '2020-06-25', 'normal', "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.");
-        let exampletaskC = ToDo('Task C', '2020-12-01', 'high', "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.");
+        let exampletaskA = ToDo('Task A', add(new Date(), { hours: -30 }), 'low', "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+        let exampletaskB = ToDo('Task B', add(new Date(), { hours: 1 }), 'low', "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+        let exampletaskC = ToDo('Task C', add(new Date(), { days: 5 }), 'normal', "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.");
+        let exampletaskD = ToDo('Task D', add(new Date(), { days: 24 }), 'high', "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.");
         exampleproject.addToDo(exampletaskA);
         exampleproject.addToDo(exampletaskB);
         exampleproject.addToDo(exampletaskC);
+        exampleproject.addToDo(exampletaskD);
         refreshMain();
+        //Starting Example
     }
 
     function projectDialogSetup() {
@@ -61,27 +65,6 @@ function Dom() {
         addprojectbtn.addEventListener('click', () => {
             projectdialog.showModal();
         })
-    }
-
-    function sidebarClear() {
-        const fbuttons = [allbtn, todaybtn, weekbtn, monthbtn];
-        fbuttons.forEach(
-            function (node) {
-                node.classList.remove("blue")
-            }
-        )
-
-        const pbuttons = projectcontainer.querySelectorAll('button');
-        pbuttons.forEach(
-            function (node) {
-                node.classList.remove("blue")
-            }
-        )
-    }
-
-    function sidebarBgColor(btn) {
-        sidebarClear();
-        btn.classList.add('blue');
     }
 
     function projectFilterSetup() {
@@ -145,7 +128,7 @@ function Dom() {
         )
         const projectdivs = projectcontainer.querySelectorAll('div');
         projectdivs.forEach(
-            function(node, index) {
+            function (node, index) {
                 if (currentPage === index) {
                     const buttontocolor = node.querySelector('button');
                     sidebarBgColor(buttontocolor);
@@ -163,24 +146,29 @@ function Dom() {
     function refreshMain() {
         clearMain();
 
+        let page;
+
         if (currentPage === "all") {
-            maincontent.append(createAllPage());
+            page = createFilterPage("All")
         } else if (currentPage === "today") {
-            maincontent.textContent = "OK";
+            page = createFilterPage("Today")
         } else if (currentPage === "week") {
-            maincontent.textContent = "all right";
+            page = createFilterPage("In 7 Days")
         } else if (currentPage === "month") {
-            maincontent.textContent = "aha";
+            page = createFilterPage("In 30 Days")
         } else {
             const project = pm.getProjectList()[currentPage];
-            maincontent.append(createProjectPage(project));
+            page = createProjectPage(project);
         }
+
+        maincontent.appendChild(page);
     }
 
-    function createAllPage() {
+    function createFilterPage(text) {
         const page = document.createElement('div');
         const header = document.createElement('h2');
-        header.textContent = "All To-Dos"
+
+        header.textContent = text;
         const todocontainer = document.createElement('div');
         todocontainer.classList.add("todocontainer");
 
@@ -188,17 +176,31 @@ function Dom() {
             function (project) {
                 project.getToDoList().forEach(
                     function (todo) {
-                        const div = createToDoMain(project, todo);
-                        todocontainer.appendChild(div);
+                        if (isToDoIncluded(todo)) {
+                            const div = createToDoMain(project, todo);
+                            todocontainer.appendChild(div);
+                        }
                     }
                 )
             }
         )
-
         page.appendChild(header);
         page.appendChild(todocontainer);
 
         return page;
+    }
+
+    function isToDoIncluded(todo) {
+        if (currentPage === "today" && todo.isToDoToday()) {
+            return true;
+        } else if (currentPage === "week" && todo.isInAWeek()) {
+            return true;
+        } else if (currentPage === "month" && todo.isInAMonth()) {
+            return true;
+        } else if (currentPage === "all") {
+            return true;
+        }
+        return false;
     }
 
     function createProjectPage(project) {
@@ -256,12 +258,12 @@ function Dom() {
         if (toedit !== false) {
             addbtn.textContent = "CHANGE";
             title.value = toedit.getTitle();
-            dueDate.value = toedit.getDate();
+            dueDate.value = format(toedit.getDate(), 'yyyy-MM-dd');
             priority.value = toedit.getPriority();
             description.value = toedit.getDescription();
 
             newform.addEventListener('submit', (e) => {
-                const todo = ToDo(title.value, dueDate.value, priority.value, description.value);
+                const todo = ToDo(title.value, new Date(dueDate.value), priority.value, description.value);
                 toedit.edit(todo);
                 e.preventDefault();
                 tododialog.close();
@@ -271,7 +273,7 @@ function Dom() {
 
         } else {
             newform.addEventListener('submit', (e) => {
-                const todo = ToDo(title.value, dueDate.value, priority.value, description.value);
+                const todo = ToDo(title.value, new Date(dueDate.value), priority.value, description.value);
                 project.addToDo(todo);
                 e.preventDefault();
                 tododialog.close();
@@ -409,7 +411,9 @@ function Dom() {
         container.classList.add('todos');
         title.textContent = todo.getTitle();
         title.classList.add("todotitle");
-        dueDate.textContent = todo.getDate();
+
+        setUpDate(container, dueDate, todo);
+
         dueDate.classList.add("tododate");
 
         setToDoColor(container, todo);
@@ -428,6 +432,25 @@ function Dom() {
         return container;
     }
 
+    function setUpDate(container, div, todo) {
+        let left;
+
+        if (todo.isOverdue()) {
+            left = "Overdue";
+            container.classList.add("overdue");
+        } else if (todo.isToDoToday()) {
+            left = "Today";
+        } else {
+            left = formatDistanceToNowStrict(todo.getDate(), {
+                unit: 'day',
+                roundingMethod: 'ceil',
+                addSuffix: true
+            });
+        }
+
+        div.textContent = left;
+    }
+
     function createToDoCheckBox(div, todo) {
         const checkbox = document.createElement('input');
         checkbox.setAttribute('type', 'checkbox');
@@ -444,8 +467,14 @@ function Dom() {
 
     function createToDoViewButton(div, todo) {
         const button = createBtn("VIEW");
+        const date = document.createElement('div');
+        date.textContent = format(todo.getDate(), "yyyy/MM/dd")
+        const text = document.createElement('div');
+        text.textContent = todo.getDescription();
         const description = document.createElement('div');
-        description.textContent = todo.getDescription();
+        description.appendChild(date);
+        description.appendChild(document.createElement('hr'));
+        description.appendChild(text);
         description.classList.add('description');
         button.addEventListener('click', () => {
             if (div.lastChild.classList.contains('description')) {
@@ -508,6 +537,27 @@ function Dom() {
         } else if (priority === 'low') {
             div.classList.add('plow');
         }
+    }
+
+    function sidebarClear() {
+        const fbuttons = [allbtn, todaybtn, weekbtn, monthbtn];
+        fbuttons.forEach(
+            function (node) {
+                node.classList.remove("blue")
+            }
+        )
+
+        const pbuttons = projectcontainer.querySelectorAll('button');
+        pbuttons.forEach(
+            function (node) {
+                node.classList.remove("blue")
+            }
+        )
+    }
+
+    function sidebarBgColor(btn) {
+        sidebarClear();
+        btn.classList.add('blue');
     }
 
     return {
