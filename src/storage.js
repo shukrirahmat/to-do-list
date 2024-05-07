@@ -49,8 +49,6 @@ function StorageHandler() {
                 })
             }
         )
-
-        console.log(toSave);
         localStorage.setItem("projects", JSON.stringify(toSave));
     }
 
