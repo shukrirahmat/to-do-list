@@ -1,4 +1,5 @@
 import pm from "./projectManager";
+import storagehandler from "./storage";
 import Project from "./project";
 import ToDo from "./todo";
 import { add, format, formatDistanceToNowStrict } from "date-fns";
@@ -23,10 +24,20 @@ function Dom() {
     const tododialog = document.querySelector('#tododialog');
 
     function initialSetup() {
-        projectFilterSetup();
-        projectDialogSetup();
 
-        //Starting Example
+        projectFilterSetup();
+        projectAddDialogSetup();
+
+        if (storagehandler.isEmpty()) {
+            loadExample()
+        } else {
+            pm.setProjectList(storagehandler.load());
+            refreshProjectList();
+        }
+        allbtn.click();
+    }
+
+    function loadExample() {
         let exampleproject = Project("Example Project");
         pm.addProject(exampleproject);
         refreshProjectList();
@@ -39,10 +50,9 @@ function Dom() {
         exampleproject.addToDo(exampletaskC);
         exampleproject.addToDo(exampletaskD);
         refreshMain();
-        //Starting Example
     }
 
-    function projectDialogSetup() {
+    function projectAddDialogSetup() {
         projectform.addEventListener('submit', (e) => {
             const name = projectnameinput.value;
             const newproject = Project(name);
@@ -135,6 +145,9 @@ function Dom() {
                 }
             }
         )
+
+        //save spot
+        storagehandler.save(pm.getProjectList());
     }
 
     function clearMain() {
@@ -162,6 +175,9 @@ function Dom() {
         }
 
         maincontent.appendChild(page);
+
+        //save spot
+        storagehandler.save(pm.getProjectList());
     }
 
     function createFilterPage(text) {
@@ -461,6 +477,7 @@ function Dom() {
         checkbox.addEventListener('click', () => {
             todo.toggleCheck(checkbox);
             setToDoColor(div, todo);
+            storagehandler.save(pm.getProjectList());
         })
         return checkbox;
     }

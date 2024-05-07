@@ -1,4 +1,4 @@
-import { isToday , differenceInCalendarDays} from "date-fns";
+import { isToday , differenceInCalendarDays, format} from "date-fns";
 
 function ToDo(title, dueDate, priority, description) {
 
@@ -12,6 +12,7 @@ function ToDo(title, dueDate, priority, description) {
     const getId = () => id;
     const getCheck = () => check;
     const setId = (newId) => { id = newId };
+    const setCheck = (newCheck) => {check = newCheck}
     
     function toggleCheck(checkbox) {
         if (checkbox.checked) {
@@ -47,6 +48,17 @@ function ToDo(title, dueDate, priority, description) {
         description = newtodo.getDescription();
     }
 
+    function getState() {
+        return {
+            title: getTitle(),
+            dueDate: format(getDate(), 'yyyy-MM-dd'),
+            priority: getPriority(),
+            description: getDescription(),
+            check: getCheck(),
+            id: getId()
+        }
+    }
+
 
 
     return {
@@ -57,12 +69,14 @@ function ToDo(title, dueDate, priority, description) {
         getPriority,
         getDescription,
         getCheck,
+        setCheck,
         toggleCheck,
         edit,
         isOverdue,
         isToDoToday,
         isInAWeek,
-        isInAMonth
+        isInAMonth,
+        getState
     };
 }
 export default ToDo;

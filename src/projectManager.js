@@ -3,6 +3,7 @@ function ProjectManager() {
     let projectList = [];
 
     const getProjectList = () => projectList;
+    const setProjectList = (list) => {projectList = list}
 
     const addProject = (project) => {
         projectList.push(project);
@@ -12,10 +13,9 @@ function ProjectManager() {
         projectList.splice(index, 1);
     }
 
-    return {getProjectList, addProject, removeProject}
+    return {getProjectList, setProjectList, addProject, removeProject}
 }
 
 const pm = ProjectManager();
-
 
 export default pm;
