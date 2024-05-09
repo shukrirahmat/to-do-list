@@ -457,11 +457,11 @@ function Dom() {
         } else if (todo.isToDoToday()) {
             left = "Today";
         } else {
-            left = formatDistanceToNowStrict(todo.getDate(), {
+            const days = formatDistanceToNowStrict(todo.getDate(), {
                 unit: 'day',
-                roundingMethod: 'ceil',
-                addSuffix: true
+                roundingMethod: 'ceil'
             });
+            left = days + " left";
         }
 
         div.textContent = left;
